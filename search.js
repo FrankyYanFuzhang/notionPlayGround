@@ -2,7 +2,7 @@ const { Client } = require('@notionhq/client');
 
 // Initializing a client
 const notion = new Client({
-    auth: "secret_qZyXqZktEuSgJ5VTdQ2r95uUv9AS7kNlLeiIJXl1cIk",
+    auth: process.env.NOTION_API_KEY,
 });
 
 // Define the database ID and search parameters
