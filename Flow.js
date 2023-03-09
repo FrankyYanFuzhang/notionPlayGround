@@ -54,7 +54,7 @@ let testCreatedDataBills = {
 
 describe('DatabaseTest', () => {
 
-    it('1. Points should retrieve a database', async () => {
+    it('1. Create a points page into database', async () => {
 
         const notion = new Client({ auth: robotBalance });
 
@@ -66,11 +66,12 @@ describe('DatabaseTest', () => {
         });
 
         console.log(response);
+
         expect(response).to.have.property('id')
 
     }).timeout(90000)
 
-    it('2. Bills should retrieve a database', async () => {
+    it('2. Bills should be created in a database', async () => {
 
         const notion = new Client({ auth: robotBalance });
 
@@ -86,6 +87,73 @@ describe('DatabaseTest', () => {
 
     }).timeout(90000)
 
+    it('3. Query Bills created today.', async () => {
 
+        const notion = new Client({ auth: robotBalance });
+        const today = new Date().toISOString().slice(0, 10);
+
+        const response = await notion.databases.query({
+            database_id: databaseIdOfBills,
+            filter: {
+                property: 'Created time',
+                created_time: {
+                    on_or_after: today,
+                },
+            },
+        });
+
+        const sum = response.results.reduce((acc, page) => {
+            const value = page.properties['Pay'].number;
+            return acc + value;
+        }, 0);
+        console.log('sum is :==== ', sum);
+
+        expect(response).to.have.property('results')
+    }).timeout(90000)
+
+    it('4. Query total Bills value.', async () => {
+
+        const notion = new Client({ auth: robotBalance });
+        const today = new Date().toISOString().slice(0, 10);
+
+        const response = await notion.databases.query({
+            database_id: databaseIdOfBills,
+            // filter: {
+            //     property: 'Created time',
+            //     created_time: {
+            //         on_or_after: today,
+            //     },
+            // },
+        });
+
+        const sum = response.results.reduce((acc, page) => {
+            const value = page.properties['Pay'].number;
+            return acc + value;
+        }, 0);
+        console.log('sum is :==== ', sum);
+
+        expect(response).to.have.property('results')
+    }).timeout(90000)
+
+
+    it('5. Query Bills record last created.', async () => {
+
+        const notion = new Client({ auth: robotBalance });
+        const today = new Date().toISOString().slice(0, 10);
+
+        const response = await notion.databases.query({
+            database_id: databaseIdOfBills,
+            sorts: [
+                {
+                  property: 'Created time',
+                  direction: 'descending',
+                },
+              ],
+              page_size: 1,
+        });
+
+        console.log(response.results[0].properties.Pay.number);
+
+    }).timeout(90000)
 })
 
